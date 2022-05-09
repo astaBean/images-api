@@ -1,0 +1,99 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/libs-release' }
+        maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
+        maven { url "https://repo.spring.io/snapshot" }
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.0.0.RELEASE')
+        classpath('mysql:mysql-connector-java:8.0.9-rc')
+        classpath('org.junit.platform:junit-platform-gradle-plugin:1.1.0')
+        //classpath('com.fasterxml.jackson.core:jackson-core:2.9.5')
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://plugins.gradle.org/m2/" }
+}
+
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext.springVersion = "5.0.3.RELEASE"
+ext.lombokVersion = "1.16.20"
+
+compileTestJava {
+    options.compilerArgs += '-parameters'
+}
+
+dependencies {
+    compile(
+            "org.projectlombok:lombok:${lombokVersion}",
+            "com.h2database:h2:1.4.196",
+            "com.google.code.gson:gson:2.8.2",
+            "org.hibernate.validator:hibernate-validator:6.0.8.Final",
+            "org.apache.logging.log4j:log4j-core:2.11.0",
+            'org.apiguardian:apiguardian-api:1.0.0',
+            'com.fasterxml.jackson.module:jackson-module-parameter-names:2.9.5',
+            'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.5',
+            'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5',
+            'org.apache.commons:commons-collections4:4.4'
+    )
+    //Spring
+    compile(
+            "org.springframework.security:spring-security-core:${springVersion}",
+            "org.springframework.security:spring-security-web:${springVersion}",
+            "org.springframework.boot:spring-boot-starter-web",
+            "org.springframework.boot:spring-boot-starter-actuator",
+            "org.springframework.boot:spring-boot-starter-data-jpa",
+            "org.springframework:spring-web:${springVersion}",
+            "org.springframework:spring-context:${springVersion}"
+    )
+    runtime("mysql:mysql-connector-java:8.0.9-rc")
+
+    annotationProcessor(
+            // Use mapstruct later
+            // "org.mapstruct:mapstruct-processor:1.3.1.Final",
+            "org.projectlombok:lombok:${lombokVersion}"
+    )
+
+    testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+
+    // Tests
+    testCompile('org.springframework.boot:spring-boot-starter-test:2.0.0.M6') {
+        exclude group: 'junit', module: 'junit'
+    }
+    testCompile(
+            'org.junit.jupiter:junit-jupiter-api:5.0.3',
+            'org.apiguardian:apiguardian-api:1.0.0',
+            'org.mockito:mockito-core:2.17.0'
+    )
+
+    testRuntime(
+            'org.junit.jupiter:junit-jupiter-engine:5.0.3',
+            'org.junit.platform:junit-platform-launcher:1.1.0'
+    )
+}
+
+
+test {
+    exclude "**/builder**"
+}
+
+
+//task seleniumTests(type: Test){
+//    include "**/selenium/**"
+//}

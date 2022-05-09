@@ -1,0 +1,44 @@
+**/.DS_Store
+
+# Eclipse Files/Folders
+**/.project
+**/.classpath
+**/.settings/*
+
+# Intellij IDEA Files
+**/.idea/*
+**/*.iml
+**/.idea
+**/*.iws
+**/*.ipr
+*.ipr
+*.iws
+
+# Gradle related
+
+**/.gradle
+**/build/
+**/gradle/caches
+**/gradle/daemon
+**/gradle/native
+**/gradle/wrapper/dists
+!/gradle/wrapper/gradle-wrapper.jar
+
+### STS ###
+**/.apt_generated
+**/.classpath
+**/.factorypath
+**/.project
+**/.settings
+**/.springBeans
+
+### Other ###
+**/target/*
+**/node/*
+**/node_modules/*
+/.project
+target/
+**/out/*
+**/logs/*
+/logs/
+/bin/
