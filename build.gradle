@@ -45,7 +45,7 @@ dependencies {
             "com.h2database:h2:1.4.196",
             "com.google.code.gson:gson:2.8.2",
             "org.hibernate.validator:hibernate-validator:6.0.8.Final",
-            "org.apache.logging.log4j:log4j-core:2.11.0",
+            "org.apache.logging.log4j:log4j-core:2.17.1",
             'org.apiguardian:apiguardian-api:1.0.0',
             'com.fasterxml.jackson.module:jackson-module-parameter-names:2.9.5',
             'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.5',

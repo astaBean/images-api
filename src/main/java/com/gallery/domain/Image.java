@@ -3,11 +3,13 @@ package com.gallery.domain;
 
 import lombok.*;
 
+import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,12 +19,16 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 @Table(name = "image")
+@EqualsAndHashCode
 public class Image {
 
     public static final String DATE_FORMAT = "YYYY/MM/dd HH:mm";
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue
+    @Type(type = "org.hibernate.type.UUIDCharType")
+    @Column(length=16)
+    private UUID uuid;
 
     @Column(length = 50)
     private String title;

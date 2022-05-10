@@ -1,5 +1,6 @@
 package com.gallery.restcontroller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.gallery.domain.Image;
 import com.gallery.repository.ImageRepository;
 import com.gallery.tools.NotificationMessage;
@@ -19,9 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -33,25 +34,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
-class ImagesRestControllerTest {
+class ImageRestControllerTest {
 
     @Autowired
     private ImageRepository imageRepository;
 
     @Autowired
-    private WebApplicationContext wac;
-
-    @Autowired
     private MockMvc mockMvc;
 
-    private static ObjectMapper mapper;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+        MAPPER.registerModule(new JavaTimeModule());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     void shouldReturnAllImages() throws Exception {
         // Given
@@ -66,13 +64,13 @@ class ImagesRestControllerTest {
         // Then
         result.andExpect(status().isOk());
         String json = result.andReturn().getResponse().getContentAsString();
-        List<Object> resultList = mapper.readValue(json, List.class);
-        List<Image> images = mapper.convertValue(resultList.get(0), List.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
+        List<Image> images = MAPPER.convertValue(resultList.get(0), List.class);
         List<NotificationMessage> notifyMessages = new ObjectMapper().convertValue(resultList.get(1), List.class);
 
         assertThat(images, hasSize(2));
-        assertThat(mapper.convertValue(images.get(0), Image.class), samePropertyValuesAs(image1));
-        assertThat(mapper.convertValue(images.get(1), Image.class), samePropertyValuesAs(image2));
+        assertThat(MAPPER.convertValue(images.get(0), Image.class), samePropertyValuesAs(image1));
+        assertThat(MAPPER.convertValue(images.get(1), Image.class), samePropertyValuesAs(image2));
     }
 
     @Test
@@ -85,7 +83,7 @@ class ImagesRestControllerTest {
         // When
         ResultActions result = mockMvc
                 .perform(MockMvcRequestBuilders
-                        .multipart("/image/createOrUpdate")
+                        .multipart("/image")
                         .file(file)
                         .header("content-type", "multipart/*")
                         .param("description", description)
@@ -94,14 +92,14 @@ class ImagesRestControllerTest {
         // Then
         result.andExpect(status().isOk());
         String json = result.andReturn().getResponse().getContentAsString();
-        List<Object> resultList = mapper.readValue(json, List.class);
-        Image resultImage = mapper.convertValue(resultList.get(0), Image.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
+        Image resultImage = MAPPER.convertValue(resultList.get(0), Image.class);
         List<NotificationMessage> notifyMessages = new ObjectMapper().convertValue(resultList.get(1), List.class);
 
         assertThat(notifyMessages.contains("Image updated successfully"), is(true));
         assertThat(resultImage.getTitle(), is(title));
         assertThat(resultImage.getDescription(), is(description));
-        assertThat(resultImage, samePropertyValuesAs(imageRepository.findById(resultImage.getId()).get()));
+        assertThat(resultImage, samePropertyValuesAs(imageRepository.findById(resultImage.getUuid()).get()));
     }
 
     @Test
@@ -115,7 +113,7 @@ class ImagesRestControllerTest {
         // When
         ResultActions result = mockMvc
                 .perform(MockMvcRequestBuilders
-                        .multipart("/image/createOrUpdate")
+                        .multipart("/image")
                         .file(file)
                         .header("content-type", "multipart/*")
                         .param("description", description)
@@ -124,8 +122,8 @@ class ImagesRestControllerTest {
         // Then
         result.andExpect(status().isOk());
         String json = result.andReturn().getResponse().getContentAsString();
-        List<Object> resultList = mapper.readValue(json, List.class);
-        String responseResult = mapper.convertValue(resultList.get(0), String.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
+        String responseResult = MAPPER.convertValue(resultList.get(0), String.class);
         List<NotificationMessage> notifyMessages = new ObjectMapper().convertValue(resultList.get(1), List.class);
 
         assertThat(responseResult, isEmptyOrNullString());
@@ -150,21 +148,21 @@ class ImagesRestControllerTest {
                         .header("content-type", "multipart/*")
                         .param("description", description)
                         .param("title", title)
-                        .param("id", String.valueOf(imageSaved.getId())));
+                        .param("uuid", String.valueOf(imageSaved.getUuid())));
 
         // Then
         result.andExpect(status().isOk());
         String json = result.andReturn().getResponse().getContentAsString();
 
-        List<Object> resultList = mapper.readValue(json, List.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
 
-        Image resultImage = mapper.convertValue(resultList.get(0), Image.class);
-        List<NotificationMessage> notifyMessages = mapper.convertValue(resultList.get(1), List.class);
+        Image resultImage = MAPPER.convertValue(resultList.get(0), Image.class);
+        List<NotificationMessage> notifyMessages = MAPPER.convertValue(resultList.get(1), List.class);
 
         assertThat(resultImage, not(imageSaved));
         assertThat(resultImage.getDescription(), is(description));
         assertThat(resultImage.getTitle(), is(title));
-        assertThat(resultImage.getId(), is(imageSaved.getId()));
+        assertThat(resultImage.getUuid(), is(imageSaved.getUuid()));
         assertThat(notifyMessages.get(0), is("Image updated successfully"));
     }
 
@@ -174,16 +172,16 @@ class ImagesRestControllerTest {
         Image imageSaved = imageRepository.save(Image.builder().path("anything").build());
 
         // When
-        ResultActions result = mockMvc.perform(get("/image/" + imageSaved.getId()));
+        ResultActions result = mockMvc.perform(get("/image/" + imageSaved.getUuid()));
 
         // Then
         result.andExpect(status().isOk());
         String json = result.andReturn().getResponse().getContentAsString();
 
-        List<Object> resultList = mapper.readValue(json, List.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
 
-        Image resultImage = mapper.convertValue(resultList.get(0), Image.class);
-        List<NotificationMessage> notifyMessages = mapper.convertValue(resultList.get(1), List.class);
+        Image resultImage = MAPPER.convertValue(resultList.get(0), Image.class);
+        List<NotificationMessage> notifyMessages = MAPPER.convertValue(resultList.get(1), List.class);
 
         assertThat(resultImage, samePropertyValuesAs(imageSaved));
         assertThat(notifyMessages, is(nullValue()));
@@ -200,9 +198,9 @@ class ImagesRestControllerTest {
         // Then
         result.andExpect(status().isOk());
         String json = result.andReturn().getResponse().getContentAsString();
-        List<Object> resultList = mapper.readValue(json, List.class);
-        String responseResult = mapper.convertValue(resultList.get(0), String.class);
-        List<NotificationMessage> notifyMessages = mapper.convertValue(resultList.get(1), List.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
+        String responseResult = MAPPER.convertValue(resultList.get(0), String.class);
+        List<NotificationMessage> notifyMessages = MAPPER.convertValue(resultList.get(1), List.class);
 
         assertThat(responseResult, isEmptyString());
         assertThat(notifyMessages.size(), is(1));
@@ -213,41 +211,38 @@ class ImagesRestControllerTest {
     @Test
     void shouldDeleteAnImage() throws Exception {
         // Given
-        Image imageSaved = imageRepository.save(Image.builder().id(66L).path("anything").build());
+        final UUID imageUuid = UUID.randomUUID();
+        final Image imageSaved = imageRepository.save(Image.builder().uuid(imageUuid).path("anything").build());
 
         // When
-        ResultActions result = mockMvc.perform(get("/image/delete/" + imageSaved.getId()));
+        final String result = mockMvc.perform(get("/image/delete/" + imageSaved.getUuid()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         // Then
-        result.andExpect(status().isOk());
-        String json = result.andReturn().getResponse().getContentAsString();
-
-
-        List<Object> resultList = mapper.readValue(json, List.class);
-        String responseResult = mapper.convertValue(resultList.get(0), String.class);
-        List<NotificationMessage> notifyMessages = mapper.convertValue(resultList.get(1), List.class);
+        final List<Object> resultList = MAPPER.readValue(result, List.class);
+        final String responseResult = MAPPER.convertValue(resultList.get(0), String.class);
+        final List<NotificationMessage> notifyMessages = MAPPER.convertValue(resultList.get(1), List.class);
 
         assertThat(responseResult, isEmptyOrNullString());
-        assertThat(notifyMessages.get(0), is("Succesfully deleted an image"));
-        assertThat(imageRepository.findById(66L).isPresent(), is(false));
+        assertThat(notifyMessages.get(0), is("Successfully deleted an image"));
+        assertThat(imageRepository.findById(imageUuid).isPresent(), is(false));
     }
 
     @Test
     void shouldReturnErrorWhenDeletingNonExistingImage() throws Exception {
         // Given
-        Long imageId = 999L;
+        final UUID imageUuid = UUID.randomUUID();
 
         // When
-        ResultActions result = mockMvc.perform(get("/image/delete/999"));
+        final String json = mockMvc.perform(get("/image/delete/" + imageUuid))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         // Then
-        result.andExpect(status().isOk());
-        String json = result.andReturn().getResponse().getContentAsString();
-
-
-        List<Object> resultList = mapper.readValue(json, List.class);
-        String responseResult = mapper.convertValue(resultList.get(0), String.class);
-        List<NotificationMessage> notifyMessages = mapper.convertValue(resultList.get(1), List.class);
+        List<Object> resultList = MAPPER.readValue(json, List.class);
+        String responseResult = MAPPER.convertValue(resultList.get(0), String.class);
+        List<NotificationMessage> notifyMessages = MAPPER.convertValue(resultList.get(1), List.class);
 
         assertThat(responseResult, isEmptyOrNullString());
         assertThat(notifyMessages.get(0), is("Image can not be deleted"));

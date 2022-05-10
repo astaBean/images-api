@@ -1,22 +1,23 @@
 package com.gallery.services;
 
 import java.util.List;
+import java.util.UUID;
 
-import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.gallery.domain.Image;
 import com.gallery.forms.ImageCreateForm;
+import com.gallery.forms.ImageUpdateForm;
 
 public interface ImageService {
 
     List<Image> findAll();
 
-    Image createOrUpdate(MultipartFile file, ImageCreateForm imageCreateForm, BindingResult bindingResult);
+    Image createImage(MultipartFile file, ImageCreateForm imageCreateForm);
 
-    Image edit(Image image);
+    Image updateImage(MultipartFile file, ImageUpdateForm imageCreateForm);
 
-    Image findById(long id);
+    Image getImage(UUID uuid);
 
-    void deleteById(long id);
+    void deleteImage(UUID uuid);
 }
