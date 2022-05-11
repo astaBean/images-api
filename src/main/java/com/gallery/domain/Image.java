@@ -3,11 +3,13 @@ package com.gallery.domain;
 
 import lombok.*;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,14 +22,17 @@ import java.util.UUID;
 @Entity
 @Table(name = "image")
 @EqualsAndHashCode
-public class Image {
+public class Image implements Serializable {
 
     public static final String DATE_FORMAT = "YYYY/MM/dd HH:mm";
 
     @Id
-    @GeneratedValue
-    @Type(type = "org.hibernate.type.UUIDCharType")
-    @Column(length=16)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
     @Column(length = 50)

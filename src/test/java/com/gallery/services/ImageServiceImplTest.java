@@ -4,14 +4,12 @@ import com.gallery.domain.Image;
 import com.gallery.error.DatabaseOperationError;
 import com.gallery.forms.ImageCreateForm;
 import com.gallery.forms.ImageUpdateForm;
+import com.gallery.notification.NotificationService;
 import com.gallery.repository.ImageRepository;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,6 +59,7 @@ class ImageServiceImplTest {
     void testFindAll_whenImagesReturnedFromRepository_shouldReturnListOfImages() {
         final Image image1 = Image.builder().uuid(UUID.randomUUID()).build();
         final Image image2 = Image.builder().uuid(UUID.randomUUID()).build();
+
         final List<Image> listReturned = Arrays.asList(image1, image2);
 
         given(imageRepository
@@ -75,7 +74,7 @@ class ImageServiceImplTest {
     }
 
     @Test
-    void testCreateImage_whenImageFailedToSave_thenDatabaseOperationErrorIsThrown() {
+    void testCreateImage_whenImageFailedToSave_thenDatabaseOperationErrorThrown() {
         final MultipartFile fileMock = new MockMultipartFile("mockFile", "whatever".getBytes());
         final ImageCreateForm imageCreateForm = ImageCreateForm.builder().build();
 
@@ -85,9 +84,8 @@ class ImageServiceImplTest {
                 .save(any(Image.class)))
                 .willThrow(exceptionToThrow);
 
-        final DatabaseOperationError result = assertThrows(DatabaseOperationError.class, () -> {
-            service.createImage(fileMock, imageCreateForm);
-        });
+        final DatabaseOperationError result = assertThrows(DatabaseOperationError.class, () ->
+                service.createImage(fileMock, imageCreateForm));
 
         assertThat(result.getMessage(), equalTo("Database operation failed"));
         verify(notificationService).addErrorMessage("Database operation failed with message: " + exceptionToThrow.getMessage());
@@ -127,7 +125,7 @@ class ImageServiceImplTest {
     }
 
     @Test
-    void testUpdateImage_whenImageFailedToSave_thenNullIsReturned() {
+    void testUpdateImage_whenImageFailedToSave_thenNullReturned() {
         final MultipartFile fileMock = new MockMultipartFile("mockFile", "whatever".getBytes());
         final ImageUpdateForm imageUpdateForm = ImageUpdateForm.builder().build();
 
@@ -151,23 +149,15 @@ class ImageServiceImplTest {
     void testUpdateImage_whenImageSavesToDatabase_thenEditedImageReturned() {
         final UUID imageUuid = UUID.randomUUID();
         final MultipartFile fileMock = new MockMultipartFile("mockFile", "whatever".getBytes());
-        final String fileLocation = "/img/gallery/" + fileMock.getOriginalFilename();
+
         final ImageUpdateForm imageUpdateForm = ImageUpdateForm.builder()
                 .title("potato")
                 .description("it is a veg")
                 .uuid(imageUuid)
                 .build();
 
-        final Optional<Image> imageReturned = Optional.of(Image.builder()
+        final Image imageReturnedFromDb = Image.builder()
                 .uuid(imageUuid)
-                .description("some other description")
-                .build());
-
-        final Image expectedImage = Image.builder()
-                .uuid(imageUuid)
-                .title(imageUpdateForm.getTitle())
-                .description(imageUpdateForm.getDescription())
-                .path(fileLocation)
                 .build();
 
         final Image updatedImageReturned = Image.builder()
@@ -176,15 +166,74 @@ class ImageServiceImplTest {
 
         given(imageRepository
                 .findById(imageUpdateForm.getUuid()))
-                .willReturn(imageReturned);
+                .willReturn(Optional.of(imageReturnedFromDb));
 
-        given(imageRepository.
-                save(same(expectedImage)))
+        given(imageRepository
+                .save(imageReturnedFromDb))
                 .willReturn(updatedImageReturned);
 
         final Image result = service.updateImage(fileMock, imageUpdateForm);
+
         assertThat(result, is(notNullValue()));
         verify(notificationService, never()).addErrorMessage(anyString());
+    }
+
+    @Test
+    void testGetImage_whenImageExistsInDatabase_thenImageReturned() {
+        final UUID uuid = UUID.randomUUID();
+
+        final Image imageReturnedFromDb = Image.builder()
+                .uuid(uuid)
+                .build();
+
+        given(imageRepository
+                .findById(uuid))
+                .willReturn(Optional.of(imageReturnedFromDb));
+
+        final Image result = service.getImage(uuid);
+
+        assertThat(result, equalTo(imageReturnedFromDb));
+    }
+
+    @Test
+    void testGetImage_whenImageNotFoundInDatabase_thenNullValueReturned() {
+        final UUID uuid = UUID.randomUUID();
+
+        final Image imageReturnedFromDb = null;
+
+        given(imageRepository
+                .findById(uuid))
+                .willReturn(Optional.ofNullable(imageReturnedFromDb));
+
+        final Image result = service.getImage(uuid);
+
+        assertThat(result, is(nullValue()));
+        verify(notificationService).addErrorMessage(String.format("Image with uuid [%s] is not found", uuid));
+    }
+
+    @Test
+    void testDeleteImage_whenUuidIsDefined_thenImageDeletedAndInfoNotificationAdded() {
+        final UUID uuid = UUID.randomUUID();
+
+        service.deleteImage(uuid);
+
+        verify(notificationService).addInfoMessage(String.format("Successfully deleted an image with uuid [%s]", uuid));
+        verify(notificationService, never()).addErrorMessage("Image can not be deleted");
+    }
+
+    @Test
+    void testDeleteImage_whenIllegalArgumentExceptionIsThrown_thenErrorNotificationAdded() {
+        final UUID uuid = null;
+        final IllegalArgumentException exceptionThrown = new IllegalArgumentException("message");
+
+        doThrow(exceptionThrown)
+                .when(imageRepository)
+                .deleteById(uuid);
+
+        service.deleteImage(uuid);
+
+        verify(notificationService, never()).addInfoMessage(anyString());
+        verify(notificationService).addErrorMessage("Image can not be deleted");
     }
 
 }

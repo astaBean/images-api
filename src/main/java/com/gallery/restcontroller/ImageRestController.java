@@ -4,7 +4,7 @@ import com.gallery.domain.Image;
 import com.gallery.forms.ImageCreateForm;
 import com.gallery.forms.ImageUpdateForm;
 import com.gallery.services.ImageService;
-import com.gallery.services.NotificationService;
+import com.gallery.notification.NotificationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,8 +32,8 @@ public class ImageRestController {
     }
 
     @GetMapping(value = "/all")
-    public List<Image> returnAll() {
-        return imageService.findAll();
+    public ResponseEntity<List<Image>> returnAll() {
+        return new ResponseEntity<>(imageService.findAll(), HttpStatus.OK);
     }
 
     @PostMapping(headers = ("content-type=multipart/*"))
@@ -70,6 +70,5 @@ public class ImageRestController {
         final UUID identifier = UUID.fromString(uuid);
         imageService.deleteImage(identifier);
     }
-
 
 }

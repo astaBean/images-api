@@ -42,3 +42,4 @@ target/
 **/logs/*
 /logs/
 /bin/
+/out/

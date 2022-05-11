@@ -4,8 +4,6 @@ import java.util.UUID;
 
 import javax.validation.constraints.Size;
 
-import org.springframework.context.annotation.Primary;
-
 import lombok.*;
 
 @Setter

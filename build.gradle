@@ -23,6 +23,7 @@ repositories {
 
 apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven'
@@ -33,6 +34,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 ext.springVersion = "5.0.3.RELEASE"
+ext.springBootVersion = "2.0.0.RELEASE"
 ext.lombokVersion = "1.16.20"
 
 compileTestJava {
@@ -56,9 +58,9 @@ dependencies {
     compile(
             "org.springframework.security:spring-security-core:${springVersion}",
             "org.springframework.security:spring-security-web:${springVersion}",
-            "org.springframework.boot:spring-boot-starter-web",
-            "org.springframework.boot:spring-boot-starter-actuator",
-            "org.springframework.boot:spring-boot-starter-data-jpa",
+            "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
             "org.springframework:spring-web:${springVersion}",
             "org.springframework:spring-context:${springVersion}"
     )
@@ -73,9 +75,10 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
     // Tests
-    testCompile('org.springframework.boot:spring-boot-starter-test:2.0.0.M6') {
+    testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
         exclude group: 'junit', module: 'junit'
     }
+
     testCompile(
             'org.junit.jupiter:junit-jupiter-api:5.0.3',
             'org.apiguardian:apiguardian-api:1.0.0',

@@ -4,6 +4,7 @@ import com.gallery.domain.Image;
 import com.gallery.error.DatabaseOperationError;
 import com.gallery.forms.ImageCreateForm;
 import com.gallery.forms.ImageUpdateForm;
+import com.gallery.notification.NotificationService;
 import com.gallery.repository.ImageRepository;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -100,7 +101,7 @@ public class ImageServiceImpl implements ImageService {
         if (image.isPresent()) {
             return image.get();
         } else {
-            this.notificationService.addErrorMessage(String.format("Image with uuid [%s] is not found", uuid));
+            notificationService.addErrorMessage(String.format("Image with uuid [%s] is not found", uuid));
             return null;
         }
     }
@@ -110,7 +111,7 @@ public class ImageServiceImpl implements ImageService {
         try {
             imageRepository.deleteById(uuid);
             notificationService.addInfoMessage(String.format("Successfully deleted an image with uuid [%s]", uuid));
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             notificationService.addErrorMessage("Image can not be deleted");
         }
     }

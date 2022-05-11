@@ -1,13 +1,13 @@
-package com.gallery.services;
+package com.gallery.notification;
 
 import com.gallery.tools.NotificationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -15,12 +15,14 @@ import java.util.List;
 public class NotificationServiceImpl implements NotificationService {
 
     private static final String NOTIFY_MSG_SESSION_KEY = "siteNotificationMessages";
+    private final List<NotificationMessage> messages = new ArrayList<>();
+
     private final HttpSession httpSession;
 
-    private final List<String> messages = new ArrayList<>();
-
     @Autowired
-    public NotificationServiceImpl(HttpSession httpSession) {this.httpSession = httpSession;}
+    public NotificationServiceImpl(HttpSession httpSession) {
+        this.httpSession = httpSession;
+    }
 
     @Override
     public void addInfoMessage(String msg) {
@@ -28,27 +30,16 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void addErrorMessages(List<ObjectError> errors) {
-        errors.forEach(s -> addNotificationMessage(NotificationMessageType.ERROR, s.toString()));
-    }
-
-    @Override
     public void addErrorMessage(String msg) {
         addNotificationMessage(NotificationMessageType.ERROR, msg);
     }
 
-    @Override
-    public String getNotificationSessionKey() {
-        return NOTIFY_MSG_SESSION_KEY;
+    public Collection<NotificationMessage> getMessages() {
+        return messages;
     }
-
     private void addNotificationMessage(NotificationMessageType type, String msg) {
-        messages.add(new NotificationMessage(type, msg).getText());
+        messages.add(new NotificationMessage(type, msg));
         httpSession.setAttribute(NOTIFY_MSG_SESSION_KEY, messages);
-    }
-
-    public enum NotificationMessageType {
-        INFO, ERROR
     }
 
 }

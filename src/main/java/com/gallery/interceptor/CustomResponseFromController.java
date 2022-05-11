@@ -10,34 +10,36 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-@RestControllerAdvice
+//@RestControllerAdvice
 public class CustomResponseFromController implements ResponseBodyAdvice<Object> {
 
-	private final HttpSession session;
+    private final HttpSession session;
 
-	public CustomResponseFromController(HttpSession session) {this.session = session;}
+    public CustomResponseFromController(HttpSession session) {
+        this.session = session;
+    }
 
-	@Override
-	public boolean supports(MethodParameter returnType,
-			Class<? extends HttpMessageConverter<?>> converterType) {
-		return true;
-	}
+    @Override
+    public boolean supports(MethodParameter returnType,
+                            Class<? extends HttpMessageConverter<?>> converterType) {
+        return true;
+    }
 
-	@Override
-	public Object beforeBodyWrite(Object body,
-			MethodParameter returnType,
-			MediaType selectedContentType,
-			Class<? extends HttpMessageConverter<?>> selectedConverterType,
-			ServerHttpRequest request,
-			ServerHttpResponse response) {
+    @Override
+    public Object beforeBodyWrite(Object body,
+                                  MethodParameter returnType,
+                                  MediaType selectedContentType,
+                                  Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                  ServerHttpRequest request,
+                                  ServerHttpResponse response) {
 
-		List<Object> listOfReturnObjects = new ArrayList<>();
-		listOfReturnObjects.add(body == null ? "" : body);
-		listOfReturnObjects.add(session.getAttribute("siteNotificationMessages"));
-		return listOfReturnObjects;
-	}
+        Collection<Object> listOfReturnObjects = new ArrayList<>();
+        listOfReturnObjects.add(body == null ? "" : body);
+        listOfReturnObjects.add(session.getAttribute("siteNotificationMessages"));
+        return listOfReturnObjects;
+    }
 
 }
 
