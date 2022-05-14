@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
@@ -222,18 +223,20 @@ class ImageServiceImplTest {
     }
 
     @Test
-    void testDeleteImage_whenIllegalArgumentExceptionIsThrown_thenErrorNotificationAdded() {
+    void testDeleteImage_whenDataIntegrityViolationException_thenErrorNotificationAddedAndDatabaseOperationExceptionIsThrown() {
         final UUID uuid = null;
-        final IllegalArgumentException exceptionThrown = new IllegalArgumentException("message");
+        final DataIntegrityViolationException exceptionThrown = new DataIntegrityViolationException("message");
 
         doThrow(exceptionThrown)
                 .when(imageRepository)
                 .deleteById(uuid);
 
-        service.deleteImage(uuid);
+        final DatabaseOperationException result = assertThrows(DatabaseOperationException.class, () ->
+                service.deleteImage(uuid));
 
         verify(notificationService, never()).addInfoMessage(anyString());
-        verify(notificationService).addErrorMessage("Image can not be deleted");
+        verify(notificationService).addErrorMessage("Image could not be deleted - reason [message]");
+        assertThat(result.getMessage(),equalTo("Image could not be deleted"));
     }
 
 }
