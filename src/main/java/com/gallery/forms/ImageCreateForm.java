@@ -1,8 +1,8 @@
 package com.gallery.forms;
 
-import javax.validation.constraints.Size;
-
 import lombok.*;
+
+import javax.validation.constraints.Size;
 
 @Setter
 @Getter

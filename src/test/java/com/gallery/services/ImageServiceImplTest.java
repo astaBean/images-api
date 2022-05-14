@@ -1,7 +1,7 @@
 package com.gallery.services;
 
 import com.gallery.domain.Image;
-import com.gallery.error.DatabaseOperationError;
+import com.gallery.exception.DatabaseOperationException;
 import com.gallery.forms.ImageCreateForm;
 import com.gallery.forms.ImageUpdateForm;
 import com.gallery.notification.NotificationService;
@@ -84,7 +84,7 @@ class ImageServiceImplTest {
                 .save(any(Image.class)))
                 .willThrow(exceptionToThrow);
 
-        final DatabaseOperationError result = assertThrows(DatabaseOperationError.class, () ->
+        final DatabaseOperationException result = assertThrows(DatabaseOperationException.class, () ->
                 service.createImage(fileMock, imageCreateForm));
 
         assertThat(result.getMessage(), equalTo("Database operation failed"));
@@ -96,7 +96,7 @@ class ImageServiceImplTest {
         final MultipartFile fileMock = new MockMultipartFile("mockFile", "whatever".getBytes());
         final ImageCreateForm imageCreateForm = ImageCreateForm.builder().build();
 
-        final Image imageReturned = Image.builder().description("some describtion").build();
+        final Image imageReturned = Image.builder().description("a description").build();
 
         given(imageRepository
                 .save(any(Image.class)))

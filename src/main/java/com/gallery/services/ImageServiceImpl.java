@@ -1,14 +1,14 @@
 package com.gallery.services;
 
 import com.gallery.domain.Image;
-import com.gallery.error.DatabaseOperationError;
+import com.gallery.exception.DatabaseOperationException;
 import com.gallery.forms.ImageCreateForm;
 import com.gallery.forms.ImageUpdateForm;
 import com.gallery.notification.NotificationService;
 import com.gallery.repository.ImageRepository;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +63,7 @@ public class ImageServiceImpl implements ImageService {
             return createdImage;
         } catch (IllegalArgumentException e) {
             notificationService.addErrorMessage("Database operation failed with message: " + e.getMessage());
-            throw new DatabaseOperationError("Database operation failed");
+            throw new DatabaseOperationException("Database operation failed");
         }
     }
 
@@ -111,8 +111,9 @@ public class ImageServiceImpl implements ImageService {
         try {
             imageRepository.deleteById(uuid);
             notificationService.addInfoMessage(String.format("Successfully deleted an image with uuid [%s]", uuid));
-        } catch (IllegalArgumentException e) {
-            notificationService.addErrorMessage("Image can not be deleted");
+        } catch (DataAccessException e) {
+            notificationService.addErrorMessage(String.format("Image could not be deleted - reason [%s]", e.getMessage()));
+            throw new DatabaseOperationException("Image could not be deleted");
         }
     }
 }

@@ -1,10 +1,9 @@
 package com.gallery.forms;
 
-import java.util.UUID;
+import lombok.*;
 
 import javax.validation.constraints.Size;
-
-import lombok.*;
+import java.util.UUID;
 
 @Setter
 @Getter

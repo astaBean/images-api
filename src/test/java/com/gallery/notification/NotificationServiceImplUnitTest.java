@@ -4,10 +4,7 @@ import com.gallery.tools.NotificationMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import javax.servlet.http.HttpSession;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,13 +13,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 class NotificationServiceImplUnitTest {
 
     private NotificationServiceImpl service;
-
-    @Mock
-    private HttpSession httpSession;
-
     @BeforeEach
     void setUp() {
-        service = new NotificationServiceImpl(httpSession);
+        service = new NotificationServiceImpl();
     }
 
     @Test
