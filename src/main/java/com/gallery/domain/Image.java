@@ -20,15 +20,11 @@ import java.util.UUID;
 @Table(name = "image")
 @EqualsAndHashCode
 public class Image implements Serializable {
-
     public static final String DATE_FORMAT = "YYYY/MM/dd HH:mm";
 
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
@@ -48,8 +44,7 @@ public class Image implements Serializable {
     private LocalDateTime dateAdded = LocalDateTime.now();
 
     @Basic(optional = false)
-    @Column(name = "updateDate",
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "updateDate", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @DateTimeFormat(pattern = DATE_FORMAT)
     @Builder.Default
     private LocalDateTime dateUpdated = LocalDateTime.now();

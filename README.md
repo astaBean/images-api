@@ -1,17 +1,30 @@
-# ImageGallery
+# Images api
 This is a project I do from time to time to experiment with newer versions with java, build tools, etc.
 
-# How to build it
-On source directory run command: gradle build
+## Requirements
+The latest version of `images-api` framework has the following minimal requirements:
+- Java 8
+- Gradle 6.8.3
+
+## Tests
+This section will describe how to run tests and what technology used.
+I currently have Junit5 unit and integration tests. Integration tests use h2 in memory database for storing or verifying data.
+As it is a small project I have not split integration and unit tests into separate tasks. 
+
+### Running tests from command line
+To run tests locally run `./gradlew test`
 
 # Running tests from IntelliJ
 Go to File -> Settings -> Uuid, Execution, Deployment -> Build Tools -> Gradle
 Set setting `Run tests using` to IntelliJ IDEA instead of gradle
 
-**Note:** Make sure your system is on default **Java 8** version if not then the tests won't run from IntelliJ.
+## How to build it
+On source directory run command `./gradlew bootRun` - you will need mysql server running on `localhost` on port `3306`. 
+The schema will be created automatically.
 
-# To Do List
-1. Fix integration tests
-2. Add new controller to get notification messages
-4. Build small consumer of the api
-5. Maybe add some selenium + cucumber scripts (or cucumber + junit 5)
+## Things to do to: 
+There are a few things that I still need to do:
+- Add GitHub actions to run application tests and build docker image - I am more familiar with CircleCi or Bitbucket pipelines
+- Add docker-compose file to build application and plugin mysql database - this is just a small project so going for simple and small configuration
+- Add new controller to get notification messages - move into it's own package
+- Build small consumer of the api

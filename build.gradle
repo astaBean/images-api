@@ -7,10 +7,9 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.18.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.3")
         classpath("mysql:mysql-connector-java:8.0.9-rc")
         classpath("org.junit.platform:junit-platform-gradle-plugin:1.1.0")
-        //classpath("com.fasterxml.jackson.core:jackson-core:2.9.5")
     }
 }
 
@@ -23,7 +22,6 @@ repositories {
 
 apply plugin: "org.junit.platform.gradle.plugin"
 apply plugin: "java"
-//apply plugin: "java-library"
 apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "maven"
@@ -33,9 +31,8 @@ apply plugin: "io.spring.dependency-management"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-ext.springBootVersion = "2.1.18.RELEASE"
+ext.springBootVersion = "2.6.3"
 ext.lombokVersion = "1.16.20"
-ext.jupiterVersion = "5.0.3"
 
 dependencies {
     compile("org.hibernate.validator:hibernate-validator:6.0.8.Final") {
@@ -45,14 +42,12 @@ dependencies {
             "org.projectlombok:lombok:${lombokVersion}",
             "com.h2database:h2:1.4.196",
             "com.google.code.gson:gson:2.8.2",
-            "org.apache.logging.log4j:log4j-core:2.17.1",
             "com.fasterxml.jackson.module:jackson-module-parameter-names:2.9.5",
             "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.5",
             "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.5",
             "org.apache.commons:commons-collections4:4.4"
     )
 
-    // Spring boot
     compile(
             "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
             "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
@@ -61,20 +56,9 @@ dependencies {
 
     runtime("mysql:mysql-connector-java:8.0.9-rc")
 
-    annotationProcessor(
-            "org.projectlombok:lombok:${lombokVersion}"
-    )
-
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
-        exclude group: "org.junit.vintage"
-    }
-
-    testCompile("org.mockito:mockito-core:2.17.0") {
-        exclude group: "org.junit.jupiter"
-    }
-
-    testCompile("org.junit.jupiter:junit-jupiter-params:5.3.1")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
 }
 
 compileTestJava {
@@ -83,10 +67,4 @@ compileTestJava {
 
 test {
     useJUnitPlatform()
-    exclude "**/builder**"
 }
-
-
-//task seleniumTests(type: Test){
-//    include "**/selenium/**"
-//}

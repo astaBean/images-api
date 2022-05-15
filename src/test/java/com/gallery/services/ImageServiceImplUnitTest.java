@@ -25,13 +25,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-class ImageServiceImplTest {
-
+class ImageServiceImplUnitTest {
     private ImageServiceImpl service;
-
     @Mock
     private ImageRepository imageRepository;
-
     @Mock
     private NotificationService notificationService;
 
@@ -236,7 +233,7 @@ class ImageServiceImplTest {
 
         verify(notificationService, never()).addInfoMessage(anyString());
         verify(notificationService).addErrorMessage("Image could not be deleted - reason [message]");
-        assertThat(result.getMessage(),equalTo("Image could not be deleted"));
+        assertThat(result.getMessage(), equalTo("Image could not be deleted"));
     }
 
 }
