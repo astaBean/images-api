@@ -2,14 +2,10 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url "https://repo.spring.io/libs-release" }
-        maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.3")
         classpath("mysql:mysql-connector-java:8.0.9-rc")
-        classpath("org.junit.platform:junit-platform-gradle-plugin:1.1.0")
     }
 }
 
@@ -20,11 +16,8 @@ repositories {
     maven { url "https://plugins.gradle.org/m2/" }
 }
 
-apply plugin: "org.junit.platform.gradle.plugin"
 apply plugin: "java"
-apply plugin: "eclipse"
 apply plugin: "idea"
-apply plugin: "maven"
 apply plugin: "org.springframework.boot"
 apply plugin: "io.spring.dependency-management"
 
@@ -35,10 +28,11 @@ ext.springBootVersion = "2.6.3"
 ext.lombokVersion = "1.16.20"
 
 dependencies {
-    compile("org.hibernate.validator:hibernate-validator:6.0.8.Final") {
+    implementation("org.hibernate.validator:hibernate-validator:6.0.8.Final") {
         exclude group: "org.junit.jupiter"
     }
-    compile(
+
+    implementation(
             "org.projectlombok:lombok:${lombokVersion}",
             "com.h2database:h2:1.4.196",
             "com.google.code.gson:gson:2.8.2",
@@ -48,13 +42,13 @@ dependencies {
             "org.apache.commons:commons-collections4:4.4"
     )
 
-    compile(
+    implementation(
             "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
             "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
             "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
     )
 
-    runtime("mysql:mysql-connector-java:8.0.9-rc")
+    runtimeOnly("mysql:mysql-connector-java:8.0.9-rc")
 
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
@@ -67,4 +61,5 @@ compileTestJava {
 
 test {
     useJUnitPlatform()
+    dependsOn cleanTest
 }

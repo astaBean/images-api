@@ -6,13 +6,16 @@ The latest version of `images-api` framework has the following minimal requireme
 - Java 8
 - Gradle 6.8.3
 
+### For installing the tools above
+Use this tool to install different java versions or  gradle versions - https://www.baeldung.com/java-sdkman-intro
+
 ## Tests
 This section will describe how to run tests and what technology used.
 I currently have Junit5 unit and integration tests. Integration tests use h2 in memory database for storing or verifying data.
 As it is a small project I have not split integration and unit tests into separate tasks. 
 
 ### Running tests from command line
-To run tests locally run `./gradlew test`
+To run tests locally run `gradle test`
 
 # Running tests from IntelliJ
 Go to File -> Settings -> Uuid, Execution, Deployment -> Build Tools -> Gradle
@@ -28,3 +31,4 @@ There are a few things that I still need to do:
 - Add docker-compose file to build application and plugin mysql database - this is just a small project so going for simple and small configuration
 - Add new controller to get notification messages - move into it's own package
 - Build small consumer of the api
+- Configure images storage - best would be s3 bucket where person using the api could register themselves by supplying s3 bucket url or any other storage link
