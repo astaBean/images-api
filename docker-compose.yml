@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:8-oracle
+    environment:
+      MYSQL_ROOT_PASSWORD: dummyPassword654
+      MYSQL_DATABASE: images
+      MYSQL_USER: imagesapi
+      MYSQL_PASSWORD: dummyPassword654
+    hostname: localhost
+    network_mode: "host"
+
+#  application goes here
+#  images-api:
+#    depends_on:
+#      - database
+

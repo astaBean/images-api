@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.3")
-        classpath("mysql:mysql-connector-java:8.0.9-rc")
         classpath("com.google.cloud.tools.jib:com.google.cloud.tools.jib.gradle.plugin:3.2.1")
     }
 }
@@ -56,7 +55,7 @@ dependencies {
             "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
     )
 
-    runtimeOnly("mysql:mysql-connector-java:8.0.9-rc")
+    runtimeOnly("mysql:mysql-connector-java:8.0.29")
 
     annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     testAnnotationProcessor("org.projectlombok:lombok:${lombokVersion}")
