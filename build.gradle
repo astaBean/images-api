@@ -2,10 +2,12 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url "https://repo.spring.io/libs-release" }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.6.3")
         classpath("mysql:mysql-connector-java:8.0.9-rc")
+        classpath("com.google.cloud.tools.jib:com.google.cloud.tools.jib.gradle.plugin:3.2.1")
     }
 }
 
@@ -20,12 +22,18 @@ apply plugin: "java"
 apply plugin: "idea"
 apply plugin: "org.springframework.boot"
 apply plugin: "io.spring.dependency-management"
+apply plugin: 'application'
+apply plugin: 'com.google.cloud.tools.jib'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
+
+jib.to.image='astaBean/images-api'
+jib.from.image='gradle:6.8.2-jdk9'
+mainClassName = 'com.images.ImagesApiApplication'
 
 ext.springBootVersion = "2.6.3"
-ext.lombokVersion = "1.16.20"
+ext.lombokVersion = "1.18.24"
 
 dependencies {
     implementation("org.hibernate.validator:hibernate-validator:6.0.8.Final") {

@@ -3,7 +3,7 @@ This is a project I do from time to time to experiment with newer versions with 
 
 ## Requirements
 The latest version of `images-api` framework has the following minimal requirements:
-- Java 8
+- Java 11
 - Gradle 6.8.3
 
 ### For installing the tools above
