@@ -43,21 +43,24 @@ When the application is running to access application api endpoints you need to 
   - title=%%ANY_STRING%%
   - file=%%FILE_LOCATION%% - example `@"/home/%%USER%%/Pictures/randomPic.png`
 
-- PUT `http://localhost:8080/image` with form parameters updates an image -This currently doesn't work
+- PUT `http://localhost:8080/image` with form parameters updates an image
   - description=%%ANY_STRING%%
   - title=%%ANY_STRING%%
   - file=%%FILE_LOCATION%% - example `@"/home/%%USER%%/Pictures/randomPic.png`
   - uuid=%%UNIQUE_IDENTIFIER%% - you can get it by doing a request to get all images; Also ths value is returned from newly create image
 
-- GET `http://localhost:8080/image/${uuid}` - get image by image identifier - doesn't work properly
-- DELETE `http://localhost:8080/image/${uuid}` - delete an image - doesn't work properly
+- GET `http://localhost:8080/image/${uuid}` - get image by image identifier
+- DELETE `http://localhost:8080/image/${uuid}` - delete an image
 
 
 ## Things to do to:
 Apis currently work in tests but do now work properly when application is running. Find out why!! - Probably because uuid is saved as blob in db
 
 There are a few other things that I still need to do:
-- Add more validation on endpoints
+- Return a message when image has been deleted successfully
+- Add more validation on endpoints (add required and non required fields)
+- Allow submission of partial data
+- Handle errors when file is missing
 - Add GitHub actions to run application tests and build docker image - I am more familiar with CircleCi or Bitbucket pipelines
 - Add docker-compose file to build application and plugin mysql database - this is just a small project so going for simple and small configuration
 - Add new controller to get notification messages - move into it's own package
